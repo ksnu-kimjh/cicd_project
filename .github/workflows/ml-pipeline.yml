@@ -1,0 +1,40 @@
+name: RL Model CI/CD Pipeline
+
+# Trigger: Executes when code is pushed to the main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-train:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Download the repository code
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    # 2. Settings up Python 3.13
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    # 3. Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # 4. Training a RL model
+    - name: Run Q-learning training
+      run: |
+        python q_learning.py --episodes 2000 --lr 0.85
+
+    # 5. Upload the trained model (pkl) as an Artifact
+    - name: Upload trained model
+      uses: actions/upload-artifact@v4
+      with:
+        name: trained-q-table
+        path: q_table.pkl
+
